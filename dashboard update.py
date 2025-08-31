@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # Custom CSS for dark theme with better contrast
-st.markdown(, unsafe_allow_html=True)
+css_styles = """
 <style>
     .main {
         background: linear-gradient(135deg, #0a0f1c 0%, #1a1f2e 100%);
@@ -79,18 +79,6 @@ st.markdown(, unsafe_allow_html=True)
         border: 1px solid #00ff88;
     }
     
-    .drone-card-enhanced {
-        background: linear-gradient(145deg, #1a2332 0%, #243040 100%);
-        padding: 25px;
-        border-radius: 15px;
-        border-left: 5px solid #00ff88;
-        margin-bottom: 25px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-        color: #ffffff;
-        border: 1px solid #00ff88;
-        min-height: 400px;
-    }
-    
     .detection-box {
         background: linear-gradient(145deg, #2a1f2e 0%, #3d2a40 100%);
         border: 2px solid #ff6b35;
@@ -107,14 +95,6 @@ st.markdown(, unsafe_allow_html=True)
         padding: 15px;
         margin: 15px 0;
         box-shadow: 0 6px 12px rgba(0, 212, 255, 0.2);
-    }
-    
-    .capture-image {
-        border: 2px solid #00d4ff;
-        border-radius: 8px;
-        width: 100%;
-        height: auto;
-        box-shadow: 0 4px 8px rgba(0, 212, 255, 0.3);
     }
     
     .marbin-card {
@@ -157,12 +137,6 @@ st.markdown(, unsafe_allow_html=True)
         font-size: 18px;
     }
     
-    .neon-text {
-        text-shadow: 0 0 15px #00d4ff, 0 0 25px #00d4ff;
-        color: #ffffff;
-        font-weight: bold;
-    }
-    
     .section-header {
         background: linear-gradient(90deg, #00ff88, #00d4ff);
         -webkit-background-clip: text;
@@ -187,32 +161,6 @@ st.markdown(, unsafe_allow_html=True)
         font-weight: 600;
     }
     
-    .water-quality-metric {
-        background: linear-gradient(145deg, #1a2332 0%, #243040 100%);
-        padding: 15px;
-        border-radius: 12px;
-        margin: 8px 0;
-        border: 1px solid #00d4ff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        color: #ffffff;
-    }
-    
-    .meter-container {
-        position: relative;
-        width: 100%;
-        height: 20px;
-        background: #1a2332;
-        border-radius: 10px;
-        border: 1px solid #00d4ff;
-        margin: 8px 0;
-    }
-    
-    .meter-fill {
-        height: 100%;
-        border-radius: 10px;
-        transition: width 0.5s ease;
-    }
-    
     .stButton button {
         background: linear-gradient(90deg, #00d4ff 0%, #0099cc 100%);
         border: 2px solid #00d4ff;
@@ -227,7 +175,9 @@ st.markdown(, unsafe_allow_html=True)
         transform: translateY(-2px);
     }
 </style>
-""", unsafe_allow_html=True)
+"""
+
+st.markdown(css_styles, unsafe_allow_html=True)
 
 # Initialize session state
 if 'current_page' not in st.session_state:
@@ -327,11 +277,12 @@ def update_live_data():
     }
 
 # Navigation
-st.markdown("""
+nav_html = """
 <div class="page-nav">
     <h3 style="color: #ffffff; margin: 0;">MAREYE Marine Monitoring System</h3>
 </div>
-""", unsafe_allow_html=True)
+"""
+st.markdown(nav_html, unsafe_allow_html=True)
 
 # Page navigation buttons
 col1, col2, col3, col4, col5 = st.columns(5)
@@ -357,7 +308,7 @@ if st.button("Refresh Data", use_container_width=True) or (datetime.now() - st.s
     st.session_state.last_update = datetime.now()
     st.rerun()
 
-# DASHBOARD PAGE - Version 1 Simple
+# DASHBOARD PAGE
 if st.session_state.current_page == 'dashboard':
     # Center everything
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -368,7 +319,7 @@ if st.session_state.current_page == 'dashboard':
             st.image("thalasea-logo.png", use_container_width=True)
         except:
             # Fallback centered text logo
-            st.markdown("""
+            logo_html = """
             <div style="text-align: center; padding: 2rem;">
                 <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
                            border-radius: 20px; padding: 3rem; margin-bottom: 2rem;">
@@ -378,17 +329,18 @@ if st.session_state.current_page == 'dashboard':
                     </div>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
-    
+            """
+            st.markdown(logo_html, unsafe_allow_html=True)
     
     # Dashboard title
-    st.markdown("""
+    title_html = """
     <div style="text-align: center; margin-top: 15px;">
         <h1 style="font-size: 32px; color: #4CAF50; font-weight: bold;">
             MAREYE DASHBOARD
         </h1>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown(title_html, unsafe_allow_html=True)
     
     # Start button
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -403,31 +355,34 @@ if st.session_state.current_page == 'dashboard':
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.markdown("""
+        card1_html = """
         <div class="metric-card">
             <h3 class="text-white-high-contrast">DRONES ACTIVE</h3>
             <h1 style="color: #00ff88; font-size: 48px; margin: 10px 0;">3</h1>
             <p class="text-white-high-contrast">All systems operational</p>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(card1_html, unsafe_allow_html=True)
     
     with col2:
-        st.markdown("""
+        card2_html = """
         <div class="metric-card">
             <h3 class="text-white-high-contrast">MARBIN UNITS</h3>
             <h1 style="color: #ff6b35; font-size: 48px; margin: 10px 0;">3</h1>
             <p class="text-white-high-contrast">1 warning status</p>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(card2_html, unsafe_allow_html=True)
     
     with col3:
-        st.markdown("""
+        card3_html = """
         <div class="metric-card">
             <h3 class="text-white-high-contrast">SMART BUOYS</h3>
             <h1 style="color: #ffbe0b; font-size: 48px; margin: 10px 0;">1</h1>
             <p class="text-white-high-contrast">Monitoring water quality</p>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(card3_html, unsafe_allow_html=True)
     
     # Quick status overview
     st.markdown('<div class="section-header">SYSTEM STATUS</div>', unsafe_allow_html=True)
@@ -536,7 +491,7 @@ if st.session_state.current_page == 'dashboard':
 
     st.plotly_chart(fig_stats, use_container_width=True)
 
-# ENHANCED DRONES PAGE
+# DRONES PAGE
 elif st.session_state.current_page == 'drones':
     st.markdown('<div class="section-header">DRONE MONITORING</div>', unsafe_allow_html=True)
     
@@ -552,7 +507,7 @@ elif st.session_state.current_page == 'drones':
         status_class = "status-online" if data['status'] == 'Active' else "status-warning"
         
         # Enhanced drone card with better layout
-        st.markdown(f"""
+        drone_card_html = f"""
         <div class="drone-card">
             <h3 class="text-white-high-contrast">{drone_name.replace('_', ' ').title()}</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin: 20px 0;">
@@ -572,7 +527,8 @@ elif st.session_state.current_page == 'drones':
             <p class="text-white-high-contrast"><strong>Location:</strong> {data['lat']:.3f}, {data['lng']:.3f}</p>
             <small style="color: #888;">Updates every 10 seconds</small>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(drone_card_html, unsafe_allow_html=True)
         
         # View Details Button
         col1, col2, col3 = st.columns([1, 1, 2])
@@ -591,12 +547,13 @@ elif st.session_state.current_page == 'drones':
                 with col1:
                     st.markdown("**Detection Log:**")
                     for detection in data['detections'][:4]:
-                        severity_color = {"High": "#ff6b35", "Medium": "#ffbe0b", "Low": "#00ff88"}
-                        st.markdown(f"""
+                        severity_colors = {"High": "#ff6b35", "Medium": "#ffbe0b", "Low": "#00ff88"}
+                        severity_color = severity_colors[detection['severity']]
+                        detection_html = f"""
                         <div class="detection-box">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <strong style="color: #00d4ff;">{detection['type']} Detected</strong>
-                                <span style="color: {severity_color[detection['severity']]}; font-weight: bold;">{detection['severity']}</span>
+                                <span style="color: {severity_color}; font-weight: bold;">{detection['severity']}</span>
                             </div>
                             <div style="margin: 8px 0;">
                                 <span style="color: #ffffff;">Time: {detection['time']}</span><br>
@@ -604,7 +561,8 @@ elif st.session_state.current_page == 'drones':
                                 <span style="color: #ffffff;">Location: {detection['location']}</span>
                             </div>
                         </div>
-                        """, unsafe_allow_html=True)
+                        """
+                        st.markdown(detection_html, unsafe_allow_html=True)
                 
                 with col2:
                     st.markdown("**Object Detection Summary:**")
@@ -612,7 +570,7 @@ elif st.session_state.current_page == 'drones':
                     plastic_count = len([d for d in data['detections'] if d['type'] == 'Plastic'])
                     oil_count = len([d for d in data['detections'] if d['type'] == 'Oil'])
                     
-                    st.markdown(f"""
+                    summary_html = f"""
                     <div class="image-detection-container">
                         <div style="text-align: center;">
                             <h4 style="color: #00ff88; margin: 0;">Detection Statistics</h4>
@@ -631,7 +589,8 @@ elif st.session_state.current_page == 'drones':
                             </div>
                         </div>
                     </div>
-                    """, unsafe_allow_html=True)
+                    """
+                    st.markdown(summary_html, unsafe_allow_html=True)
                 
                 # Image Detection Section with actual drone captures
                 if data['image_detections']:
@@ -642,21 +601,23 @@ elif st.session_state.current_page == 'drones':
                     
                     with img_col1:
                         img_detection = data['image_detections'][0]
-                        st.markdown(f"""
+                        container_html = f"""
                         <div class="image-detection-container">
                             <h5 style="color: #00d4ff; text-align: center; margin-bottom: 10px;">{img_detection['title']}</h5>
                         </div>
-                        """, unsafe_allow_html=True)
+                        """
+                        st.markdown(container_html, unsafe_allow_html=True)
                         
                         try:
                             st.image(img_detection['image'], caption="Drone Capture 1", use_container_width=True)
                         except:
-                            st.markdown("""
+                            placeholder_html = """
                             <div style="background: #1a2332; border: 2px solid #00d4ff; border-radius: 8px; padding: 40px; text-align: center; color: #00d4ff;">
                                 📷 Drone Capture 1<br>
                                 <small style="color: #888;">Image: picture 1 drone capture.jpeg</small>
                             </div>
-                            """, unsafe_allow_html=True)
+                            """
+                            st.markdown(placeholder_html, unsafe_allow_html=True)
                         
                         st.markdown("**Detected Objects:**")
                         for obj in img_detection['objects']:
@@ -664,21 +625,23 @@ elif st.session_state.current_page == 'drones':
                     
                     with img_col2:
                         img_detection = data['image_detections'][1]
-                        st.markdown(f"""
+                        container_html = f"""
                         <div class="image-detection-container">
                             <h5 style="color: #00d4ff; text-align: center; margin-bottom: 10px;">{img_detection['title']}</h5>
                         </div>
-                        """, unsafe_allow_html=True)
+                        """
+                        st.markdown(container_html, unsafe_allow_html=True)
                         
                         try:
                             st.image(img_detection['image'], caption="Drone Capture 2", use_container_width=True)
                         except:
-                            st.markdown("""
+                            placeholder_html = """
                             <div style="background: #1a2332; border: 2px solid #00d4ff; border-radius: 8px; padding: 40px; text-align: center; color: #00d4ff;">
                                 📷 Drone Capture 2<br>
                                 <small style="color: #888;">Image: picture 2 drone capture.jpeg</small>
                             </div>
-                            """, unsafe_allow_html=True)
+                            """
+                            st.markdown(placeholder_html, unsafe_allow_html=True)
                         
                         st.markdown("**Detected Objects:**")
                         for obj in img_detection['objects']:
@@ -686,21 +649,23 @@ elif st.session_state.current_page == 'drones':
                     
                     with img_col3:
                         img_detection = data['image_detections'][2]
-                        st.markdown(f"""
+                        container_html = f"""
                         <div class="image-detection-container">
                             <h5 style="color: #00d4ff; text-align: center; margin-bottom: 10px;">{img_detection['title']}</h5>
                         </div>
-                        """, unsafe_allow_html=True)
+                        """
+                        st.markdown(container_html, unsafe_allow_html=True)
                         
                         try:
                             st.image(img_detection['image'], caption="Drone Capture 3", use_container_width=True)
                         except:
-                            st.markdown("""
+                            placeholder_html = """
                             <div style="background: #1a2332; border: 2px solid #00d4ff; border-radius: 8px; padding: 40px; text-align: center; color: #00d4ff;">
                                 📷 Drone Capture 3<br>
                                 <small style="color: #888;">Image: picture 3 drone capture.jpeg</small>
                             </div>
-                            """, unsafe_allow_html=True)
+                            """
+                            st.markdown(placeholder_html, unsafe_allow_html=True)
                         
                         st.markdown("**Detected Objects:**")
                         for obj in img_detection['objects']:
@@ -789,7 +754,7 @@ elif st.session_state.current_page == 'marbin':
     for i, (marbin_name, data) in enumerate(st.session_state.marbin_data.items(), 1):
         status_class = "status-online" if data['status'] == 'Normal' else "status-critical"
         
-        st.markdown(f"""
+        marbin_html = f"""
         <div class="marbin-card">
             <h3 class="text-white-high-contrast">MarBin {i}</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
@@ -808,7 +773,8 @@ elif st.session_state.current_page == 'marbin':
             </div>
             <small style="color: #888;">Last Update: {data['last_update']}</small>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(marbin_html, unsafe_allow_html=True)
 
 # SMART BUOY PAGE
 elif st.session_state.current_page == 'buoy':
@@ -819,14 +785,15 @@ elif st.session_state.current_page == 'buoy':
     
     buoy_data = st.session_state.buoy_data['buoy_1']
     
-    st.markdown(f"""
+    buoy_card_html = f"""
     <div class="buoy-card">
         <h3 class="text-white-high-contrast">Smart Buoy 1</h3>
         <p class="text-white-high-contrast"><strong>Last Reading:</strong> {buoy_data['last_reading']}</p>
         <p class="text-white-high-contrast"><strong>Battery Level:</strong> <span style="color: #00ff88; font-size: 20px;">{buoy_data['battery']}%</span></p>
         <small style="color: #888;">Updates every 10 minutes</small>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    st.markdown(buoy_card_html, unsafe_allow_html=True)
     
     # Create gauge meters using Plotly
     st.markdown("### Water Quality Parameters", unsafe_allow_html=True)
@@ -871,12 +838,12 @@ elif st.session_state.current_page == 'buoy':
             color = '#ffbe0b'  # Yellow for warning
         
         fig_gauges.add_trace(go.Indicator(
-            mode = "gauge+number+delta",
-            value = value,
-            domain = {'x': [pos[0], pos[1]], 'y': [pos[2], pos[3]]},
-            title = {'text': f"<b>{gauge_data['name']}</b>", 'font': {'color': 'white', 'size': 14}},
-            number = {'suffix': f" {gauge_data['unit']}", 'font': {'color': 'white', 'size': 16}},
-            gauge = {
+            mode="gauge+number+delta",
+            value=value,
+            domain={'x': [pos[0], pos[1]], 'y': [pos[2], pos[3]]},
+            title={'text': f"<b>{gauge_data['name']}</b>", 'font': {'color': 'white', 'size': 14}},
+            number={'suffix': f" {gauge_data['unit']}", 'font': {'color': 'white', 'size': 16}},
+            gauge={
                 'axis': {'range': [None, gauge_data['range'][1]], 'tickcolor': 'white', 'tickfont': {'color': 'white', 'size': 10}},
                 'bar': {'color': color, 'thickness': 0.8},
                 'bgcolor': "rgba(26, 35, 50, 0.8)",
@@ -975,12 +942,13 @@ elif st.session_state.current_page == 'authorities':
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.markdown("""
+        form_card_html = """
         <div class="metric-card">
             <h3 class="text-white-high-contrast">Report Incident / Complaint</h3>
             <p class="text-white-high-contrast">Please provide detailed information about the incident</p>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(form_card_html, unsafe_allow_html=True)
         
         # Report form
         report_text = st.text_area("Write your report here:", height=200, placeholder="Describe the incident or complaint in detail...")
@@ -994,25 +962,26 @@ elif st.session_state.current_page == 'authorities':
         if st.button("SUBMIT REPORT", use_container_width=True):
             if report_text:
                 st.success("Report submitted successfully!")
-                st.markdown(f"""
+                success_html = f"""
                 <div style="background: linear-gradient(145deg, #1e2936 0%, #2a3441 100%); padding: 25px; border-radius: 15px; border: 2px solid #00ff88; margin-top: 20px;">
                     <h3 style="color: #00ff88; text-align: center;">Thank You for Your Report</h3>
                     <p class="text-white-high-contrast" style="text-align: center;">We will review your report and take appropriate action.</p>
                     <p class="text-white-high-contrast" style="text-align: center;">Your contribution helps us protect our marine environment.</p>
                     <div style="text-align: center; font-size: 48px; margin: 20px 0;">
-                        Marine Protection
+                        🌊
                     </div>
                     <div style="background: rgba(0, 212, 255, 0.1); padding: 15px; border-radius: 10px; border: 1px solid #00d4ff;">
                         <h4 style="color: #00d4ff; text-align: center;">Report ID: MR-{datetime.now().strftime("%Y%m%d%H%M%S")}</h4>
                         <p class="text-white-high-contrast" style="text-align: center;">Reference this ID for follow-up inquiries</p>
                     </div>
                 </div>
-                """, unsafe_allow_html=True)
+                """
+                st.markdown(success_html, unsafe_allow_html=True)
             else:
                 st.error("Please enter your report before submitting.")
     
     with col2:
-        st.markdown("""
+        emergency_html = """
         <div class="metric-card">
             <h3 class="text-white-high-contrast">Emergency Contacts</h3>
             <div style="margin: 20px 0;">
@@ -1028,9 +997,10 @@ elif st.session_state.current_page == 'authorities':
                 <p class="text-white-high-contrast">+60-7-2XX-XXXX</p>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(emergency_html, unsafe_allow_html=True)
         
-        st.markdown("""
+        guidelines_html = """
         <div class="metric-card">
             <h3 class="text-white-high-contrast">Reporting Guidelines</h3>
             <ul class="text-white-high-contrast">
@@ -1041,11 +1011,12 @@ elif st.session_state.current_page == 'authorities':
                 <li>Provide your contact information</li>
             </ul>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(guidelines_html, unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
-st.markdown(f"""
+footer_html = f"""
 <div style="text-align: center; padding: 25px; background: linear-gradient(145deg, #1a2332 0%, #243040 100%); border-radius: 15px; border: 1px solid #00d4ff;">
     <h3 style="color: #00d4ff;">MAREYE Marine Pollution Detection System</h3>
     <p class="text-white-high-contrast">Protecting our oceans with advanced monitoring technology</p>
@@ -1056,3 +1027,4 @@ st.markdown(f"""
     </div>
 </div>
 """
+st.markdown(footer_html, unsafe_allow_html=True)
