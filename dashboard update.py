@@ -326,42 +326,6 @@ def update_live_data():
         }
     }
 
-# Function to create water quality meter
-def create_water_quality_meter(parameter, value, min_val, max_val, optimal_range, unit):
-    # Calculate percentage for the meter
-    percentage = ((value - min_val) / (max_val - min_val)) * 100
-    
-    # Determine color based on optimal range
-    if optimal_range[0] <= value <= optimal_range[1]:
-        color = '#00ff88'  # Green for optimal
-        status = 'Optimal'
-    elif value < optimal_range[0] * 0.8 or value > optimal_range[1] * 1.2:
-        color = '#ff6b35'  # Red for critical
-        status = 'Critical'
-    else:
-        color = '#ffbe0b'  # Yellow for warning
-        status = 'Warning'
-    
-    return f"""
-    <div class="water-quality-metric">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h6 style="margin: 0; color: #00d4ff; font-weight: bold; font-size: 16px;">{parameter}</h6>
-            <span style="color: {color}; font-weight: bold; font-size: 14px;">{status}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0;">
-            <span style="font-size: 20px; font-weight: bold; color: #ffffff;">{value} {unit}</span>
-        </div>
-        <div class="meter-container">
-            <div class="meter-fill" style="width: {percentage}%; background: linear-gradient(90deg, {color}, {color}80);"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #888;">
-            <span>{min_val} {unit}</span>
-            <span>Optimal: {optimal_range[0]}-{optimal_range[1]} {unit}</span>
-            <span>{max_val} {unit}</span>
-        </div>
-    </div>
-    """
-
 # Navigation
 st.markdown("""
 <div class="page-nav">
@@ -424,7 +388,9 @@ if st.session_state.current_page == 'dashboard':
             MAREYE DASHBOARD
         </h1>
     </div>
-    """, unsafe_allow_html=True)    # Start button
+    """, unsafe_allow_html=True)
+    
+    # Start button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("START MONITORING", use_container_width=True, key="start_monitoring"):
@@ -667,6 +633,7 @@ elif st.session_state.current_page == 'drones':
                     st.markdown(f"""
                     <div class="image-detection-container">
                         <h5 style="color: #00d4ff; text-align: center; margin-bottom: 10px;">{img_detection['title']}</h5>
+                    </div>
                     """, unsafe_allow_html=True)
                     
                     try:
@@ -682,14 +649,13 @@ elif st.session_state.current_page == 'drones':
                     st.markdown("**Detected Objects:**")
                     for obj in img_detection['objects']:
                         st.markdown(f"• <span style='color: #ff6b35;'>{obj}</span>", unsafe_allow_html=True)
-                    
-                    st.markdown("</div>", unsafe_allow_html=True)
                 
                 with img_col2:
                     img_detection = data['image_detections'][1]
                     st.markdown(f"""
                     <div class="image-detection-container">
                         <h5 style="color: #00d4ff; text-align: center; margin-bottom: 10px;">{img_detection['title']}</h5>
+                    </div>
                     """, unsafe_allow_html=True)
                     
                     try:
@@ -705,14 +671,13 @@ elif st.session_state.current_page == 'drones':
                     st.markdown("**Detected Objects:**")
                     for obj in img_detection['objects']:
                         st.markdown(f"• <span style='color: #ff6b35;'>{obj}</span>", unsafe_allow_html=True)
-                    
-                    st.markdown("</div>", unsafe_allow_html=True)
                 
                 with img_col3:
                     img_detection = data['image_detections'][2]
                     st.markdown(f"""
                     <div class="image-detection-container">
                         <h5 style="color: #00d4ff; text-align: center; margin-bottom: 10px;">{img_detection['title']}</h5>
+                    </div>
                     """, unsafe_allow_html=True)
                     
                     try:
@@ -728,8 +693,6 @@ elif st.session_state.current_page == 'drones':
                     st.markdown("**Detected Objects:**")
                     for obj in img_detection['objects']:
                         st.markdown(f"• <span style='color: #ff6b35;'>{obj}</span>", unsafe_allow_html=True)
-                    
-                    st.markdown("</div>", unsafe_allow_html=True)
 
         # For other drones, show simple status
         elif drone_name != 'drone_1':
@@ -748,3 +711,329 @@ elif st.session_state.current_page == 'drones':
 
 # MARBIN PAGE
 elif st.session_state.current_page == 'marbin':
+    st.markdown('<div class="section-header">MARBIN MONITORING</div>', unsafe_allow_html=True)
+    
+    if not st.session_state.marbin_data:
+        update_live_data()
+    
+    # Location radar
+    fig_location = go.Figure()
+    
+    # Add circular grid
+    theta = np.linspace(0, 2*np.pi, 100)
+    for r in [0.3, 0.6, 1.0]:
+        fig_location.add_trace(go.Scatterpolar(
+            r=[r]*len(theta),
+            theta=theta*180/np.pi,
+            mode='lines',
+            line=dict(color='rgba(0, 212, 255, 0.4)', width=2),
+            showlegend=False
+        ))
+    
+    # Add MarBin positions
+    positions = [
+        {'name': 'MarBin 1', 'r': 0.8, 'theta': 45, 'status': 'Normal'},
+        {'name': 'MarBin 2', 'r': 0.6, 'theta': 180, 'status': 'Warning'},
+        {'name': 'MarBin 3', 'r': 0.9, 'theta': 300, 'status': 'Normal'}
+    ]
+    
+    for pos in positions:
+        color = '#00ff88' if pos['status'] == 'Normal' else '#ff6b35'
+        fig_location.add_trace(go.Scatterpolar(
+            r=[pos['r']],
+            theta=[pos['theta']],
+            mode='markers+text',
+            marker=dict(size=20, color=color),
+            text=[pos['name']],
+            textposition="top center",
+            name=pos['name'],
+            textfont=dict(size=14, color='white')
+        ))
+    
+    fig_location.update_layout(
+        polar=dict(
+            bgcolor='rgba(26, 35, 50, 0.8)',
+            radialaxis=dict(visible=False, range=[0, 1]),
+            angularaxis=dict(visible=False)
+        ),
+        showlegend=False,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        height=400,
+        margin=dict(l=0, r=0, t=0, b=0),
+        title=dict(text="MarBin Locations", x=0.5, font=dict(color='#00d4ff', size=20))
+    )
+    
+    st.plotly_chart(fig_location, use_container_width=True)
+    
+    # MarBin status cards
+    for i, (marbin_name, data) in enumerate(st.session_state.marbin_data.items(), 1):
+        status_class = "status-online" if data['status'] == 'Normal' else "status-critical"
+        
+        st.markdown(f"""
+        <div class="marbin-card">
+            <h3 class="text-white-high-contrast">MarBin {i}</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                <div>
+                    <p class="text-white-high-contrast"><strong>Oil Spill Detection:</strong></p>
+                    <p style="color: #ff6b35; font-size: 24px; font-weight: bold;">{data['oil_spill']}%</p>
+                    <p class="text-white-high-contrast"><strong>Trash Collected:</strong></p>
+                    <p style="color: #00ff88; font-size: 24px; font-weight: bold;">{data['trash_collected']}%</p>
+                </div>
+                <div>
+                    <p class="text-white-high-contrast"><strong>Battery Level:</strong></p>
+                    <p style="color: #00d4ff; font-size: 24px; font-weight: bold;">{data['battery']}%</p>
+                    <p class="text-white-high-contrast"><strong>Status:</strong></p>
+                    <p class="{status_class}">{data['status']}</p>
+                </div>
+            </div>
+            <small style="color: #888;">Last Update: {data['last_update']}</small>
+        </div>
+        """, unsafe_allow_html=True)
+
+# SMART BUOY PAGE
+elif st.session_state.current_page == 'buoy':
+    st.markdown('<div class="section-header">SMART BUOY MONITORING</div>', unsafe_allow_html=True)
+    
+    if not st.session_state.buoy_data:
+        update_live_data()
+    
+    buoy_data = st.session_state.buoy_data['buoy_1']
+    
+    st.markdown(f"""
+    <div class="buoy-card">
+        <h3 class="text-white-high-contrast">Smart Buoy 1</h3>
+        <p class="text-white-high-contrast"><strong>Last Reading:</strong> {buoy_data['last_reading']}</p>
+        <p class="text-white-high-contrast"><strong>Battery Level:</strong> <span style="color: #00ff88; font-size: 20px;">{buoy_data['battery']}%</span></p>
+        <small style="color: #888;">Updates every 10 minutes</small>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Create gauge meters using Plotly
+    st.markdown("### Water Quality Parameters", unsafe_allow_html=True)
+    
+    # Define gauge parameters
+    gauges_data = [
+        {'name': 'pH', 'value': buoy_data['ph'], 'range': [0, 14], 'optimal': [6.5, 8.5], 'unit': ''},
+        {'name': 'SALINITY', 'value': buoy_data['salinity'], 'range': [0, 50], 'optimal': [30, 35], 'unit': 'ppt'},
+        {'name': 'TURBIDITY', 'value': buoy_data['turbidity'], 'range': [0, 300], 'optimal': [0, 200], 'unit': 'NTU'},
+        {'name': 'CALCIUM', 'value': buoy_data['calcium'], 'range': [0, 300], 'optimal': [100, 200], 'unit': 'mg/L'},
+        {'name': 'MAGNESIUM', 'value': buoy_data['magnesium'], 'range': [0, 200], 'optimal': [140, 160], 'unit': 'mg/L'},
+        {'name': 'DO LEVELS', 'value': buoy_data['do_levels'], 'range': [0, 15], 'optimal': [6, 14], 'unit': 'mg/L'},
+        {'name': 'AMMONIA', 'value': buoy_data['ammonia'], 'range': [0, 0.05], 'optimal': [0, 0.02], 'unit': 'mg/L'},
+        {'name': 'TEMPERATURE', 'value': buoy_data['temperature'], 'range': [0, 40], 'optimal': [25, 30], 'unit': '°C'}
+    ]
+    
+    # Create 4x2 grid of gauges
+    fig_gauges = go.Figure()
+    
+    # Define positions for 4x2 grid
+    positions = [
+        (0, 0.23, 0.5, 1),      # Top row, column 1
+        (0.27, 0.5, 0.5, 1),    # Top row, column 2
+        (0.53, 0.76, 0.5, 1),   # Top row, column 3
+        (0.79, 1, 0.5, 1),      # Top row, column 4
+        (0, 0.23, 0, 0.5),      # Bottom row, column 1
+        (0.27, 0.5, 0, 0.5),    # Bottom row, column 2
+        (0.53, 0.76, 0, 0.5),   # Bottom row, column 3
+        (0.79, 1, 0, 0.5)       # Bottom row, column 4
+    ]
+    
+    for i, (gauge_data, pos) in enumerate(zip(gauges_data, positions)):
+        # Determine color based on optimal range
+        value = gauge_data['value']
+        optimal = gauge_data['optimal']
+        
+        if optimal[0] <= value <= optimal[1]:
+            color = '#00ff88'  # Green for optimal
+        elif value < optimal[0] * 0.8 or value > optimal[1] * 1.2:
+            color = '#ff6b35'  # Red for critical
+        else:
+            color = '#ffbe0b'  # Yellow for warning
+        
+        fig_gauges.add_trace(go.Indicator(
+            mode = "gauge+number+delta",
+            value = value,
+            domain = {'x': [pos[0], pos[1]], 'y': [pos[2], pos[3]]},
+            title = {'text': f"<b>{gauge_data['name']}</b>", 'font': {'color': 'white', 'size': 14}},
+            number = {'suffix': f" {gauge_data['unit']}", 'font': {'color': 'white', 'size': 16}},
+            gauge = {
+                'axis': {'range': [None, gauge_data['range'][1]], 'tickcolor': 'white', 'tickfont': {'color': 'white', 'size': 10}},
+                'bar': {'color': color, 'thickness': 0.8},
+                'bgcolor': "rgba(26, 35, 50, 0.8)",
+                'borderwidth': 2,
+                'bordercolor': "#00d4ff",
+                'steps': [
+                    {'range': [gauge_data['range'][0], gauge_data['optimal'][0]], 'color': "rgba(255, 107, 53, 0.3)"},
+                    {'range': [gauge_data['optimal'][0], gauge_data['optimal'][1]], 'color': "rgba(0, 255, 136, 0.3)"},
+                    {'range': [gauge_data['optimal'][1], gauge_data['range'][1]], 'color': "rgba(255, 107, 53, 0.3)"}
+                ],
+                'threshold': {
+                    'line': {'color': "white", 'width': 4},
+                    'thickness': 0.75,
+                    'value': value
+                }
+            }
+        ))
+    
+    fig_gauges.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font={'color': "white", 'family': "Arial"},
+        height=600,
+        margin=dict(l=20, r=20, t=40, b=20),
+        showlegend=False
+    )
+    
+    st.plotly_chart(fig_gauges, use_container_width=True)
+    
+    # Historical Trends section
+    st.markdown("### Historical Trends")
+    
+    # Generate sample historical data for the past 7 days
+    dates = pd.date_range(end=datetime.now(), periods=7, freq='D')
+    
+    fig_trends = go.Figure()
+    
+    # Add trend lines for key parameters
+    trend_params = ['pH', 'Salinity', 'Temperature', 'DO Levels']
+    trend_colors = ['#00d4ff', '#ff6b35', '#ffbe0b', '#00ff88']
+    
+    for param, color in zip(trend_params, trend_colors):
+        # Generate realistic trend data
+        base_values = {'pH': 7, 'Salinity': 32, 'Temperature': 26, 'DO Levels': 7}
+        base = base_values[param]
+        
+        values = []
+        for i in range(len(dates)):
+            noise = np.random.normal(0, base * 0.05)  # 5% noise
+            values.append(base + noise)
+        
+        fig_trends.add_trace(go.Scatter(
+            x=dates,
+            y=values,
+            mode='lines+markers',
+            name=param,
+            line=dict(color=color, width=3),
+            marker=dict(size=8),
+            hovertemplate=f'<b>{param}</b><br>Date: %{{x}}<br>Value: %{{y:.2f}}<extra></extra>'
+        ))
+    
+    fig_trends.update_layout(
+        title=dict(
+            text="7-Day Parameter Trends",
+            x=0.5,
+            font=dict(color='#00d4ff', size=20)
+        ),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(26, 35, 50, 0.8)',
+        font=dict(color='white', size=14),
+        xaxis=dict(
+            gridcolor='rgba(0, 212, 255, 0.2)',
+            title="Date",
+            title_font=dict(color='#00d4ff', size=14)
+        ),
+        yaxis=dict(
+            gridcolor='rgba(0, 212, 255, 0.2)',
+            title="Parameter Values",
+            title_font=dict(color='#00d4ff', size=14)
+        ),
+        legend=dict(
+            bgcolor='rgba(26, 35, 50, 0.8)',
+            bordercolor='#00d4ff',
+            borderwidth=2,
+            font=dict(size=12, color='white')
+        ),
+        height=400
+    )
+    
+    st.plotly_chart(fig_trends, use_container_width=True)
+
+# AUTHORITIES PAGE
+elif st.session_state.current_page == 'authorities':
+    st.markdown('<div class="section-header">REPORT TO AUTHORITIES</div>', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        st.markdown("""
+        <div class="metric-card">
+            <h3 class="text-white-high-contrast">Report Incident / Complaint</h3>
+            <p class="text-white-high-contrast">Please provide detailed information about the incident</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Report form
+        report_text = st.text_area("Write your report here:", height=200, placeholder="Describe the incident or complaint in detail...")
+        
+        col_form1, col_form2 = st.columns([1, 1])
+        with col_form1:
+            uploaded_file = st.file_uploader("Add Media Evidence", type=['jpg', 'png', 'mp4', 'pdf'])
+        with col_form2:
+            report_type = st.selectbox("Report Type", ["Marine Pollution", "Equipment Malfunction", "Emergency", "General Complaint"])
+        
+        if st.button("SUBMIT REPORT", use_container_width=True):
+            if report_text:
+                st.success("Report submitted successfully!")
+                st.markdown(f"""
+                <div style="background: linear-gradient(145deg, #1e2936 0%, #2a3441 100%); padding: 25px; border-radius: 15px; border: 2px solid #00ff88; margin-top: 20px;">
+                    <h3 style="color: #00ff88; text-align: center;">Thank You for Your Report</h3>
+                    <p class="text-white-high-contrast" style="text-align: center;">We will review your report and take appropriate action.</p>
+                    <p class="text-white-high-contrast" style="text-align: center;">Your contribution helps us protect our marine environment.</p>
+                    <div style="text-align: center; font-size: 48px; margin: 20px 0;">
+                        Marine Protection
+                    </div>
+                    <div style="background: rgba(0, 212, 255, 0.1); padding: 15px; border-radius: 10px; border: 1px solid #00d4ff;">
+                        <h4 style="color: #00d4ff; text-align: center;">Report ID: MR-{datetime.now().strftime("%Y%m%d%H%M%S")}</h4>
+                        <p class="text-white-high-contrast" style="text-align: center;">Reference this ID for follow-up inquiries</p>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.error("Please enter your report before submitting.")
+    
+    with col2:
+        st.markdown("""
+        <div class="metric-card">
+            <h3 class="text-white-high-contrast">Emergency Contacts</h3>
+            <div style="margin: 20px 0;">
+                <h4 style="color: #ff6b35;">Emergency Hotline</h4>
+                <p class="text-white-high-contrast" style="font-size: 24px; font-weight: bold;">999</p>
+            </div>
+            <div style="margin: 20px 0;">
+                <h4 style="color: #00d4ff;">Marine Department</h4>
+                <p class="text-white-high-contrast">+60-3-8000-8000</p>
+            </div>
+            <div style="margin: 20px 0;">
+                <h4 style="color: #00ff88;">Local Authorities</h4>
+                <p class="text-white-high-contrast">+60-7-2XX-XXXX</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="metric-card">
+            <h3 class="text-white-high-contrast">Reporting Guidelines</h3>
+            <ul class="text-white-high-contrast">
+                <li>Include location coordinates if possible</li>
+                <li>Add photos or videos as evidence</li>
+                <li>Describe the severity of the incident</li>
+                <li>Mention any immediate dangers</li>
+                <li>Provide your contact information</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+
+# Footer
+st.markdown("---")
+st.markdown(f"""
+<div style="text-align: center; padding: 25px; background: linear-gradient(145deg, #1a2332 0%, #243040 100%); border-radius: 15px; border: 1px solid #00d4ff;">
+    <h3 style="color: #00d4ff;">MAREYE Marine Pollution Detection System</h3>
+    <p class="text-white-high-contrast">Protecting our oceans with advanced monitoring technology</p>
+    <div style="display: flex; justify-content: center; gap: 30px; margin: 15px 0;">
+        <span class="text-white-high-contrast">Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</span>
+        <span>Status: <span style="color: #00ff88; font-weight: bold;">ONLINE</span></span>
+        <span class="text-white-high-contrast">Current Page: {st.session_state.current_page.title()}</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
