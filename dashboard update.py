@@ -945,7 +945,3 @@ footer_html = f"""
 </div>
 """
 st.markdown(footer_html, unsafe_allow_html=True)
-                        <p style="color: #ff6b35; font-size: 28px; font-weight: bold; margin: 5px 0;">{len(buoy_data['detections'])}</p>
-                        <p style="color: #ffffff; font-size: 14px;">Unique Detections</p>
-                    </div>
-                    <div>
