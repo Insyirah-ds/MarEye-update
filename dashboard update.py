@@ -153,10 +153,6 @@ def update_live_data():
             'ph': round(random.uniform(6.5, 7.5), 1),
             'salinity': round(random.uniform(28, 35), 1),
             'turbidity': round(random.uniform(100, 150), 0),
-            'calcium': round(random.uniform(90, 110), 0),
-            'magnesium': round(random.uniform(140, 160), 0),
-            'do_levels': round(random.uniform(6, 8), 1),
-            'ammonia': round(random.uniform(0.005, 0.015), 3),
             'temperature': round(random.uniform(24, 28), 1),
             'last_reading': current_time.strftime("%d-%m-%Y at %H:%M:%S"),
             'camera_status': 'Recording',
@@ -355,23 +351,18 @@ buoy_info_html = f"""
 """
 st.markdown(buoy_info_html, unsafe_allow_html=True)
 
-# Water quality gauges in compact grid
+# Water quality gauges - only 4 parameters
 gauges_data = [
     {'name': 'pH', 'value': buoy_data['ph'], 'range': [0, 14], 'optimal': [6.5, 8.5], 'unit': ''},
     {'name': 'SALINITY', 'value': buoy_data['salinity'], 'range': [0, 50], 'optimal': [30, 35], 'unit': 'ppt'},
     {'name': 'TURBIDITY', 'value': buoy_data['turbidity'], 'range': [0, 300], 'optimal': [0, 200], 'unit': 'NTU'},
-    {'name': 'CALCIUM', 'value': buoy_data['calcium'], 'range': [0, 300], 'optimal': [100, 200], 'unit': 'mg/L'},
-    {'name': 'MAGNESIUM', 'value': buoy_data['magnesium'], 'range': [0, 200], 'optimal': [140, 160], 'unit': 'mg/L'},
-    {'name': 'DO', 'value': buoy_data['do_levels'], 'range': [0, 15], 'optimal': [6, 14], 'unit': 'mg/L'},
-    {'name': 'AMMONIA', 'value': buoy_data['ammonia'], 'range': [0, 0.05], 'optimal': [0, 0.02], 'unit': 'mg/L'},
-    {'name': 'TEMP', 'value': buoy_data['temperature'], 'range': [0, 40], 'optimal': [25, 30], 'unit': '°C'}
+    {'name': 'TEMPERATURE', 'value': buoy_data['temperature'], 'range': [0, 40], 'optimal': [25, 30], 'unit': '°C'}
 ]
 
 fig_gauges = go.Figure()
 
 positions = [
-    (0, 0.23, 0.5, 1), (0.27, 0.5, 0.5, 1), (0.53, 0.76, 0.5, 1), (0.79, 1, 0.5, 1),
-    (0, 0.23, 0, 0.5), (0.27, 0.5, 0, 0.5), (0.53, 0.76, 0, 0.5), (0.79, 1, 0, 0.5)
+    (0, 0.23, 0, 1), (0.27, 0.5, 0, 1), (0.53, 0.76, 0, 1), (0.79, 1, 0, 1)
 ]
 
 for gauge_data, pos in zip(gauges_data, positions):
@@ -389,10 +380,10 @@ for gauge_data, pos in zip(gauges_data, positions):
         mode="gauge+number",
         value=value,
         domain={'x': [pos[0], pos[1]], 'y': [pos[2], pos[3]]},
-        title={'text': f"<b>{gauge_data['name']}</b>", 'font': {'color': 'white', 'size': 12}},
-        number={'suffix': f" {gauge_data['unit']}", 'font': {'color': 'white', 'size': 14}},
+        title={'text': f"<b>{gauge_data['name']}</b>", 'font': {'color': 'white', 'size': 14}},
+        number={'suffix': f" {gauge_data['unit']}", 'font': {'color': 'white', 'size': 16}},
         gauge={
-            'axis': {'range': [None, gauge_data['range'][1]], 'tickcolor': 'white', 'tickfont': {'color': 'white', 'size': 8}},
+            'axis': {'range': [None, gauge_data['range'][1]], 'tickcolor': 'white', 'tickfont': {'color': 'white', 'size': 10}},
             'bar': {'color': color, 'thickness': 0.7},
             'bgcolor': "rgba(26, 35, 50, 0.8)",
             'borderwidth': 2,
@@ -408,7 +399,7 @@ for gauge_data, pos in zip(gauges_data, positions):
 fig_gauges.update_layout(
     paper_bgcolor='rgba(0,0,0,0)',
     font={'color': "white"},
-    height=500,
+    height=300,
     margin=dict(l=20, r=20, t=20, b=20),
     showlegend=False
 )
