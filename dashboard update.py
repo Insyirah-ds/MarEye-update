@@ -116,10 +116,11 @@ with col2:
     card_html = f"""
     <div class="metric-card">
         <h4 class="text-white-high-contrast">DEBRIS DETECTED</h4>
-        <h1 style="color: #ff6b35; font-size: 36px; margin: 5px 0;">25</h1>
+        <h1 style="color: #ff6b35; font-size: 36px; margin: 5px 0;">{len(buoy_data["detections"])}</h1>
         <p class="text-white-high-contrast">Today's count</p>
     </div>
     """
+    st.markdown(card_html, unsafe_allow_html=True)
 
 with col3:
     card_html = f"""
@@ -392,4 +393,3 @@ footerhtml = f"""
 </div>
 """
 st.markdown(footerhtml, unsafe_allow_html=True)
-
