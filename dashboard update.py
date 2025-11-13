@@ -127,16 +127,18 @@ if 'gps_history' not in st.session_state:
 # Function to generate random live data
 def update_live_data():
     current_time = datetime.now()
+    # Fixed base at Tanjung Aru, Kota Kinabalu, Sabah
+    base_lat = 5.9552
+    base_lng = 116.0400
     if not st.session_state.gps_history:
-        base_lat = 1.4
-        base_lng = 103.7
+        lat, lng = base_lat, base_lng
     else:
         last_pos = st.session_state.gps_history[-1]
-        base_lat = last_pos['lat'] + random.uniform(-0.001, 0.001)
-        base_lng = last_pos['lng'] + random.uniform(-0.001, 0.001)
+        lat = last_pos['lat'] + random.uniform(-0.0005, 0.0005)
+        lng = last_pos['lng'] + random.uniform(-0.0005, 0.0005)
     st.session_state.gps_history.append({
-        'lat': base_lat,
-        'lng': base_lng,
+        'lat': lat,
+        'lng': lng,
         'timestamp': current_time
     })
     if len(st.session_state.gps_history) > 50:
@@ -145,8 +147,8 @@ def update_live_data():
         'buoy_1': {
             'status': 'Active',
             'battery': random.randint(75, 95),
-            'lat': base_lat,
-            'lng': base_lng,
+            'lat': lat,
+            'lng': lng,
             'ph': round(random.uniform(6.5, 7.5), 1),
             'salinity': round(random.uniform(28, 35), 1),
             'turbidity': round(random.uniform(100, 150), 0),
@@ -178,7 +180,7 @@ if not st.session_state.buoy_data:
 buoy_data = st.session_state.buoy_data['buoy_1']
 st.markdown("---")
 
-# ============= OVERVIEW METRICS (Water Temp REMOVED, everything else remains) =============
+# ============= OVERVIEW METRICS =============
 st.markdown('<div class="section-header">📊 SYSTEM OVERVIEW</div>', unsafe_allow_html=True)
 col1, col2, col3, col4 = st.columns(4)
 
@@ -224,7 +226,7 @@ with col4:
 
 st.markdown("---")
 
-# ============= GPS TRACKING SECTION =============
+# ============= GPS TRACKING SECTION (Tanjung Aru) =============
 st.markdown('<div class="section-header">📡 GPS TRACKING & LOCATION</div>', unsafe_allow_html=True)
 
 gps_status_html = f"""
@@ -256,7 +258,7 @@ col1, col2 = st.columns([2, 1])
 with col1:
     if st.session_state.gps_history:
         df_map = pd.DataFrame([{'lat': buoy_data['lat'], 'lon': buoy_data['lng']}])
-        st.map(df_map, zoom=13)
+        st.map(df_map, zoom=14)
 
 with col2:
     if len(st.session_state.gps_history) > 1:
@@ -356,7 +358,6 @@ fig_gauges.update_layout(
 )
 
 st.plotly_chart(fig_gauges, use_container_width=True)
-
 st.markdown("---")
 
 # ============= DEBRIS DETECTION SECTION =============
