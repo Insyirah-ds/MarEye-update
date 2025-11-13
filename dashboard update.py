@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
 from datetime import datetime, timedelta
 import random
 
@@ -25,12 +24,10 @@ custom_css = """
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);color: #ffffff;border: 1px solid #00ff88;}
     .status-online {color: #00ff88;font-weight: bold;font-size: 18px;}
     .section-header {background: linear-gradient(90deg, #00ff88, #00d4ff);-webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;font-size: 28px;font-weight: bold;
-        margin: 30px 0 20px 0;}
+        -webkit-text-fill-color: transparent;font-size: 28px;font-weight: bold;margin: 30px 0 20px 0;}
     .text-white-high-contrast {color: #ffffff !important;text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);font-weight: 600;}
     .stButton button {background: linear-gradient(90deg, #00d4ff 0%, #0099cc 100%);
-        border: 2px solid #00d4ff;color: #ffffff;font-weight: bold;box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-        transition: all 0.3s ease;}
+        border: 2px solid #00d4ff;color: #ffffff;font-weight: bold;box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);transition: all 0.3s ease;}
     .stButton button:hover {box-shadow: 0 0 25px rgba(0, 212, 255, 0.5);transform: translateY(-2px);}
 </style>
 """
@@ -39,7 +36,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # --- HEADER LOGO + TITLE ---
 col1, col2, col3 = st.columns([1,2,1])
 with col2:
-    st.image("image.jpg", width=110)  # Use your logo if preferred
+    st.image("thalasea_logo.png", width=110)  # Use any image as main logo
 
 st.markdown("""
 <div style="text-align: center; margin-bottom: 20px;">
@@ -83,15 +80,22 @@ def update_live_data():
     })
     if len(st.session_state.gps_history) > 50:
         st.session_state.gps_history = st.session_state.gps_history[-50:]
+
+    image_files = [
+        "picture 1 drone capture.jpeg",
+        "picture 2 drone capture.jpeg",
+        "picture 3 drone capture.jpeg",
+        "plastic image for cctv 2.jpg"
+    ]
     detections = [
         {'type':'Plastic Bottle','time':'14:39:32','confidence':'94%','distance':'2.3m'},
         {'type':'Food Container','time':'12:52:50','confidence':'87%','distance':'1.8m'},
         {'type':'Fishing Net','time':'16:14:20','confidence':'91%','distance':'3.1m'},
         {'type':'Plastic Bag','time':'10:30:05','confidence':'78%','distance':'1.5m'}
     ]
-    for d in detections:
+    for i, d in enumerate(detections):
         d['lat'], d['lng'] = random_gps()
-        d['img'] = "image.jpg"
+        d['img'] = image_files[i]
     st.session_state.buoy_data = {
         'buoy_1': {
             'status':'Active',
@@ -121,8 +125,7 @@ if not st.session_state.buoy_data:
 buoy_data = st.session_state.buoy_data['buoy_1']
 st.markdown("---")
 
-
-# ============= OVERVIEW METRICS =============
+# OVERVIEW METRICS
 st.markdown('<div class="section-header">📊 SYSTEM OVERVIEW</div>', unsafe_allow_html=True)
 col1, col2, col3, col4 = st.columns(4)
 with col1:
@@ -150,7 +153,7 @@ with col4:
     """, unsafe_allow_html=True)
 st.markdown("---")
 
-# ============= GPS TRACKING SECTION =============
+# GPS TRACKING SECTION
 st.markdown('<div class="section-header">📡 GPS TRACKING & LOCATION</div>', unsafe_allow_html=True)
 gps_status_html = f"""
 <div class="buoy-card">
@@ -209,7 +212,7 @@ with col2:
         st.markdown(stats_html, unsafe_allow_html=True)
 st.markdown("---")
 
-# ============= WATER QUALITY SECTION =============
+# WATER QUALITY SECTION
 st.markdown('<div class="section-header">💧 WATER QUALITY MONITORING</div>', unsafe_allow_html=True)
 buoy_info_html = f"""
 <div class="buoy-card">
@@ -269,7 +272,7 @@ fig_gauges.update_layout(
 st.plotly_chart(fig_gauges, use_container_width=True)
 st.markdown("---")
 
-# ============= RECENT DETECTIONS with MODAL & GPS =============
+# RECENT DETECTIONS
 st.markdown("""<h4 style="margin-bottom: 1rem; color: #cccccc;">Recent Detections:</h4>""", unsafe_allow_html=True)
 for idx, detection in enumerate(buoy_data['detections']):
     colA, colB, colC = st.columns([2.2, 1.0, 1.4])
@@ -325,7 +328,7 @@ else:
     st.session_state['show_modal'] = False
     st.session_state['modal_index'] = None
 
-# ============= ANALYTICS & TRENDS =============
+# ANALYTICS & TRENDS
 st.markdown('<div class="section-header">📈 ANALYTICS & TRENDS</div>', unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
