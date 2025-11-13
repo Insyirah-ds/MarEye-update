@@ -60,6 +60,16 @@ def update_live_data():
     st.session_state.gps_history.append({"lat": lat, "lng": lng, "timestamp": current_time})
     if len(st.session_state.gps_history) > 50:
         st.session_state.gps_history = st.session_state.gps_history[-50:]
+    # Generate 25 detections
+    detection_types = ["Plastic Bottle", "Food Container", "Fishing Net", "Plastic Bag", "Styrofoam", "Rope", "Metal Can"]
+    detections = []
+    for i in range(25):
+        detections.append({
+            "type": random.choice(detection_types),
+            "time": (datetime.now() - timedelta(minutes=random.randint(0, 600))).strftime("%H:%M:%S"),
+            "confidence": random.randint(75, 99),
+            "distance": f"{random.uniform(1.0,4.0):.1f}m"
+        })
     st.session_state.buoy_data = {
         "buoy1": {
             "status": "Active",
@@ -71,12 +81,7 @@ def update_live_data():
             "turbidity": round(random.uniform(5, 25), 1), # NTU
             "lastreading": current_time.strftime("%d-%m-%Y at %H:%M:%S"),
             "camera_status": "Recording",
-            "detections": [
-                {"type": "Plastic Bottle", "time": "14:39:32", "confidence": 94, "distance": "2.3m"},
-                {"type": "Food Container", "time": "12:52:50", "confidence": 87, "distance": "1.8m"},
-                {"type": "Fishing Net", "time": "16:14:20", "confidence": 91, "distance": "3.1m"},
-                {"type": "Plastic Bag", "time": "10:30:05", "confidence": 78, "distance": "1.5m"}
-            ]
+            "detections": detections
         }
     }
 
