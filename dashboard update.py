@@ -102,11 +102,9 @@ css_styles = """
 st.markdown(css_styles, unsafe_allow_html=True)
 
 # --- Centered, Large Logo ---
-st.markdown("""
-    <div style="text-align: center;">
-        <img src="thalasea-logo.png" width="220">
-    </div>
-""", unsafe_allow_html=True)
+col1, col2, col3 = st.columns([1,2,1])
+with col2:
+    st.image("thalasea-logo.png", width=320)  # increase width for larger logo
 
 title_html = """
 <div style="text-align: center; margin-bottom: 20px;">
