@@ -21,11 +21,9 @@ css_styles = """
         background: linear-gradient(135deg, #0a0f1c 0%, #1a1f2e 100%);
         color: #ffffff;
     }
-    
     .stApp {
         background: linear-gradient(135deg, #0a0f1c 0%, #1a1f2e 100%);
     }
-    
     .dashboard-header {
         background: linear-gradient(90deg, #00d4ff 0%, #0099cc 50%, #004d66 100%);
         padding: 25px;
@@ -34,7 +32,6 @@ css_styles = """
         box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
         border: 2px solid #00d4ff;
     }
-    
     .metric-card {
         background: linear-gradient(145deg, #1e2a3a 0%, #2a3441 100%);
         padding: 25px;
@@ -44,7 +41,6 @@ css_styles = """
         margin-bottom: 20px;
         color: #ffffff;
     }
-    
     .buoy-card {
         background: linear-gradient(145deg, #1a2332 0%, #243040 100%);
         padding: 20px;
@@ -55,7 +51,6 @@ css_styles = """
         color: #ffffff;
         border: 1px solid #00ff88;
     }
-    
     .detection-box {
         background: linear-gradient(145deg, #2a1f2e 0%, #3d2a40 100%);
         border: 2px solid #ff6b35;
@@ -64,7 +59,6 @@ css_styles = """
         margin: 10px 0;
         box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
     }
-    
     .camera-feed-container {
         background: linear-gradient(145deg, #1e2332 0%, #2a2f40 100%);
         border: 2px solid #00d4ff;
@@ -73,13 +67,11 @@ css_styles = """
         margin: 15px 0;
         box-shadow: 0 6px 12px rgba(0, 212, 255, 0.2);
     }
-    
     .status-online {
         color: #00ff88;
         font-weight: bold;
         font-size: 18px;
     }
-    
     .section-header {
         background: linear-gradient(90deg, #00ff88, #00d4ff);
         -webkit-background-clip: text;
@@ -88,13 +80,11 @@ css_styles = """
         font-weight: bold;
         margin: 30px 0 20px 0;
     }
-    
     .text-white-high-contrast {
         color: #ffffff !important;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
         font-weight: 600;
     }
-    
     .stButton button {
         background: linear-gradient(90deg, #00d4ff 0%, #0099cc 100%);
         border: 2px solid #00d4ff;
@@ -103,14 +93,12 @@ css_styles = """
         box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
         transition: all 0.3s ease;
     }
-    
     .stButton button:hover {
         box-shadow: 0 0 25px rgba(0, 212, 255, 0.5);
         transform: translateY(-2px);
     }
 </style>
 """
-
 st.markdown(css_styles, unsafe_allow_html=True)
 
 # Initialize session state
@@ -124,8 +112,6 @@ if 'gps_history' not in st.session_state:
 # Function to generate random live data
 def update_live_data():
     current_time = datetime.now()
-    
-    # Simulate GPS movement (drift with current)
     if not st.session_state.gps_history:
         base_lat = 1.4
         base_lng = 103.7
@@ -133,17 +119,13 @@ def update_live_data():
         last_pos = st.session_state.gps_history[-1]
         base_lat = last_pos['lat'] + random.uniform(-0.001, 0.001)
         base_lng = last_pos['lng'] + random.uniform(-0.001, 0.001)
-    
     st.session_state.gps_history.append({
         'lat': base_lat,
         'lng': base_lng,
         'timestamp': current_time
     })
-    
     if len(st.session_state.gps_history) > 50:
         st.session_state.gps_history = st.session_state.gps_history[-50:]
-    
-    # Buoy data
     st.session_state.buoy_data = {
         'buoy_1': {
             'status': 'Active',
@@ -165,24 +147,14 @@ def update_live_data():
         }
     }
 
-# Header with logo
+# Logo and dashboard header
 col1, col2, col3 = st.columns([1, 1, 1])
-
 with col2:
-    logo_html = """
-    <div style="text-align: center; padding: 1rem;">
-        <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
-                   border-radius: 20px; padding: 2rem; margin-bottom: 1rem;">
-            <div style="background: rgba(255,255,255,0.1); border-radius: 15px; padding: 1.5rem;">
-                <h1 style="font-size: 3rem; color: #00BCD4; margin: 0;">🌊</h1>
-                <h2 style="color: white; margin: 0.5rem 0 0 0; font-size: 1.5rem; letter-spacing: 3px;">MAREYE</h2>
-            </div>
-        </div>
-    </div>
-    """
-    st.markdown(logo_html, unsafe_allow_html=True)
+    st.image("thalasea-logo.png", width=120)
+    st.markdown("""
+        <h2 style="color: white; margin: 0.5rem 0 0 0; font-size: 1.5rem; letter-spacing: 3px; text-align:center;">MAREYE</h2>
+    """, unsafe_allow_html=True)
 
-# Dashboard title
 title_html = """
 <div style="text-align: center; margin-bottom: 20px;">
     <h1 style="font-size: 32px; color: #4CAF50; font-weight: bold;">
@@ -200,25 +172,18 @@ with col2:
         update_live_data()
         st.session_state.last_update = datetime.now()
         st.rerun()
-
-# Auto-update logic
 if (datetime.now() - st.session_state.last_update).seconds > 10:
     update_live_data()
     st.session_state.last_update = datetime.now()
     st.rerun()
-
 if not st.session_state.buoy_data:
     update_live_data()
-
 buoy_data = st.session_state.buoy_data['buoy_1']
-
 st.markdown("---")
 
 # ============= OVERVIEW METRICS =============
 st.markdown('<div class="section-header">📊 SYSTEM OVERVIEW</div>', unsafe_allow_html=True)
-
 col1, col2, col3, col4, col5 = st.columns(5)
-
 with col1:
     card_html = f"""
     <div class="metric-card">
@@ -228,7 +193,6 @@ with col1:
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
-
 with col2:
     card_html = f"""
     <div class="metric-card">
@@ -238,7 +202,6 @@ with col2:
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
-
 with col3:
     card_html = f"""
     <div class="metric-card">
@@ -248,7 +211,6 @@ with col3:
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
-
 with col4:
     card_html = f"""
     <div class="metric-card">
@@ -258,7 +220,6 @@ with col4:
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
-
 with col5:
     card_html = f"""
     <div class="metric-card">
@@ -268,12 +229,10 @@ with col5:
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
-
 st.markdown("---")
 
 # ============= GPS TRACKING SECTION =============
 st.markdown('<div class="section-header">📡 GPS TRACKING & LOCATION</div>', unsafe_allow_html=True)
-
 gps_status_html = f"""
 <div class="buoy-card">
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px;">
@@ -297,14 +256,11 @@ gps_status_html = f"""
 </div>
 """
 st.markdown(gps_status_html, unsafe_allow_html=True)
-
 col1, col2 = st.columns([2, 1])
-
 with col1:
     if st.session_state.gps_history:
         df_map = pd.DataFrame([{'lat': buoy_data['lat'], 'lon': buoy_data['lng']}])
         st.map(df_map, zoom=13)
-
 with col2:
     if len(st.session_state.gps_history) > 1:
         first_pos = st.session_state.gps_history[0]
@@ -312,7 +268,6 @@ with col2:
         lat_diff = abs(last_pos['lat'] - first_pos['lat'])
         lng_diff = abs(last_pos['lng'] - first_pos['lng'])
         approx_distance = ((lat_diff ** 2 + lng_diff ** 2) ** 0.5) * 111
-        
         stats_html = f"""
         <div class="camera-feed-container">
             <h4 style="color: #00d4ff; text-align: center;">Movement Stats</h4>
@@ -333,12 +288,10 @@ with col2:
         </div>
         """
         st.markdown(stats_html, unsafe_allow_html=True)
-
 st.markdown("---")
 
 # ============= WATER QUALITY SECTION =============
 st.markdown('<div class="section-header">💧 WATER QUALITY MONITORING</div>', unsafe_allow_html=True)
-
 buoy_info_html = f"""
 <div class="buoy-card">
     <h4 class="text-white-high-contrast">Water Quality Station</h4>
@@ -350,32 +303,25 @@ buoy_info_html = f"""
 </div>
 """
 st.markdown(buoy_info_html, unsafe_allow_html=True)
-
-# Water quality gauges - only 4 parameters
 gauges_data = [
     {'name': 'pH', 'value': buoy_data['ph'], 'range': [0, 14], 'optimal': [6.5, 8.5], 'unit': ''},
     {'name': 'SALINITY', 'value': buoy_data['salinity'], 'range': [0, 50], 'optimal': [30, 35], 'unit': 'ppt'},
     {'name': 'TURBIDITY', 'value': buoy_data['turbidity'], 'range': [0, 300], 'optimal': [0, 200], 'unit': 'NTU'},
     {'name': 'TEMPERATURE', 'value': buoy_data['temperature'], 'range': [0, 40], 'optimal': [25, 30], 'unit': '°C'}
 ]
-
 fig_gauges = go.Figure()
-
 positions = [
     (0, 0.23, 0, 1), (0.27, 0.5, 0, 1), (0.53, 0.76, 0, 1), (0.79, 1, 0, 1)
 ]
-
 for gauge_data, pos in zip(gauges_data, positions):
     value = gauge_data['value']
     optimal = gauge_data['optimal']
-    
     if optimal[0] <= value <= optimal[1]:
         color = '#00ff88'
     elif value < optimal[0] * 0.8 or value > optimal[1] * 1.2:
         color = '#ff6b35'
     else:
         color = '#ffbe0b'
-    
     fig_gauges.add_trace(go.Indicator(
         mode="gauge+number",
         value=value,
@@ -395,7 +341,6 @@ for gauge_data, pos in zip(gauges_data, positions):
             ]
         }
     ))
-
 fig_gauges.update_layout(
     paper_bgcolor='rgba(0,0,0,0)',
     font={'color': "white"},
@@ -403,14 +348,11 @@ fig_gauges.update_layout(
     margin=dict(l=20, r=20, t=20, b=20),
     showlegend=False
 )
-
 st.plotly_chart(fig_gauges, use_container_width=True)
-
 st.markdown("---")
 
 # ============= DEBRIS DETECTION SECTION =============
 st.markdown('<div class="section-header">🎥 MARINE DEBRIS DETECTION</div>', unsafe_allow_html=True)
-
 camera_status_html = f"""
 <div class="buoy-card">
     <h4 class="text-white-high-contrast">AI-Powered Camera System</h4>
@@ -435,9 +377,7 @@ camera_status_html = f"""
 </div>
 """
 st.markdown(camera_status_html, unsafe_allow_html=True)
-
 col1, col2 = st.columns([3, 2])
-
 with col1:
     st.markdown("**Recent Detections:**")
     for detection in buoy_data['detections']:
@@ -454,12 +394,9 @@ with col1:
         </div>
         """
         st.markdown(detection_html, unsafe_allow_html=True)
-
 with col2:
-    # Detection trends chart
     dates = pd.date_range(end=datetime.now(), periods=7, freq='D')
     detections = np.random.poisson(3, len(dates))
-    
     fig_detections = go.Figure()
     fig_detections.add_trace(go.Bar(
         x=dates,
@@ -467,7 +404,6 @@ with col2:
         marker_color='#ff6b35',
         name='Daily Detections'
     ))
-    
     fig_detections.update_layout(
         title=dict(text="7-Day Detection Trend", font=dict(color='#00d4ff', size=16)),
         paper_bgcolor='rgba(0,0,0,0)',
@@ -478,27 +414,20 @@ with col2:
         height=300,
         margin=dict(l=40, r=20, t=40, b=40)
     )
-    
     st.plotly_chart(fig_detections, use_container_width=True)
-
 st.markdown("---")
 
 # ============= ANALYTICS SECTION =============
 st.markdown('<div class="section-header">📈 ANALYTICS & TRENDS</div>', unsafe_allow_html=True)
-
 col1, col2 = st.columns(2)
-
 with col1:
-    # Detection type breakdown
     detection_types = {'Plastic': 45, 'Fishing Gear': 25, 'Food Containers': 20, 'Other': 10}
-    
     fig_pie = go.Figure(data=[go.Pie(
         labels=list(detection_types.keys()),
         values=list(detection_types.values()),
         hole=0.4,
         marker=dict(colors=['#ff6b35', '#00d4ff', '#ffbe0b', '#00ff88'])
     )])
-    
     fig_pie.update_layout(
         title=dict(text="Debris Type Distribution", x=0.5, font=dict(color='#00d4ff', size=18)),
         paper_bgcolor='rgba(0,0,0,0)',
@@ -506,13 +435,9 @@ with col1:
         height=350,
         showlegend=True
     )
-    
     st.plotly_chart(fig_pie, use_container_width=True)
-
 with col2:
-    # Water quality trend
     dates = pd.date_range(end=datetime.now(), periods=7, freq='D')
-    
     fig_trends = go.Figure()
     fig_trends.add_trace(go.Scatter(
         x=dates, y=[7 + np.random.normal(0, 0.2) for _ in range(7)],
@@ -526,7 +451,6 @@ with col2:
         x=dates, y=[26 + np.random.normal(0, 0.5) for _ in range(7)],
         mode='lines+markers', name='Temp', line=dict(color='#ffbe0b', width=2)
     ))
-    
     fig_trends.update_layout(
         title=dict(text="7-Day Water Quality Trends", x=0.5, font=dict(color='#00d4ff', size=18)),
         paper_bgcolor='rgba(0,0,0,0)',
@@ -536,9 +460,7 @@ with col2:
         yaxis=dict(gridcolor='rgba(0, 212, 255, 0.2)'),
         height=350
     )
-    
     st.plotly_chart(fig_trends, use_container_width=True)
-
 st.markdown("---")
 
 # Footer
