@@ -147,13 +147,10 @@ def update_live_data():
         }
     }
 
-# Logo and dashboard header
-col1, col2, col3 = st.columns([1, 1, 1])
+# --- Logo Section (Centered, Large, No Text Underneath) ---
+col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    st.image("thalasea-logo.png", width=120)
-    st.markdown("""
-        <h2 style="color: white; margin: 0.5rem 0 0 0; font-size: 1.5rem; letter-spacing: 3px; text-align:center;">MAREYE</h2>
-    """, unsafe_allow_html=True)
+    st.image("thalasea-logo.png", width=220)
 
 title_html = """
 <div style="text-align: center; margin-bottom: 20px;">
