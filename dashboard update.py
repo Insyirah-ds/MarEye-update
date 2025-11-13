@@ -101,6 +101,23 @@ css_styles = """
 """
 st.markdown(css_styles, unsafe_allow_html=True)
 
+# --- Centered, Large Logo ---
+st.markdown("""
+    <div style="text-align: center;">
+        <img src="thalasea-logo.png" width="220">
+    </div>
+""", unsafe_allow_html=True)
+
+title_html = """
+<div style="text-align: center; margin-bottom: 20px;">
+    <h1 style="font-size: 32px; color: #4CAF50; font-weight: bold;">
+        SMART BUOY MONITORING SYSTEM
+    </h1>
+    <p style="color: #00d4ff; font-size: 18px;">Real-time Marine Monitoring • AI Debris Detection • GPS Tracking • Water Quality</p>
+</div>
+"""
+st.markdown(title_html, unsafe_allow_html=True)
+
 # Initialize session state
 if 'last_update' not in st.session_state:
     st.session_state.last_update = datetime.now()
@@ -146,21 +163,6 @@ def update_live_data():
             ]
         }
     }
-
-# --- Logo Section (Centered, Large, No Text Underneath) ---
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    st.image("thalasea-logo.png", width=220)
-
-title_html = """
-<div style="text-align: center; margin-bottom: 20px;">
-    <h1 style="font-size: 32px; color: #4CAF50; font-weight: bold;">
-        SMART BUOY MONITORING SYSTEM
-    </h1>
-    <p style="color: #00d4ff; font-size: 18px;">Real-time Marine Monitoring • AI Debris Detection • GPS Tracking • Water Quality</p>
-</div>
-"""
-st.markdown(title_html, unsafe_allow_html=True)
 
 # Auto-refresh and manual refresh
 col1, col2, col3 = st.columns([2, 1, 2])
