@@ -147,7 +147,6 @@ def update_live_data():
             'ph': round(random.uniform(7.8, 8.4), 2),  # seawater pH
             'tds': random.randint(32000, 38000),        # ppm seawater
             'turbidity': round(random.uniform(5, 25), 1),  # seawater NTU
-            'temperature': round(random.uniform(28, 31), 1), # in °C for tropic sea
             'last_reading': current_time.strftime("%d-%m-%Y at %H:%M:%S"),
             'camera_status': 'Recording',
             'detections': [
@@ -273,7 +272,7 @@ with col2:
         st.markdown(stats_html, unsafe_allow_html=True)
 st.markdown("---")
 
-# WATER QUALITY SECTION
+# WATER QUALITY SECTION -- removed temperature gauge
 st.markdown('<div class="section-header">💧 WATER QUALITY MONITORING</div>', unsafe_allow_html=True)
 buoy_info_html = f"""
 <div class="buoy-card">
@@ -289,10 +288,10 @@ gauges_data = [
     {'name': 'pH', 'value': buoy_data['ph'], 'range': [0, 14], 'optimal': [7.8, 8.5], 'unit': ''},
     {'name': 'TDS', 'value': buoy_data['tds'], 'range': [0, 50000], 'optimal': [30000, 40000], 'unit': 'ppm'},
     {'name': 'TURBIDITY', 'value': buoy_data['turbidity'], 'range': [0, 100], 'optimal': [0, 50], 'unit': 'NTU'},
-    {'name': 'TEMPERATURE', 'value': buoy_data['temperature'], 'range': [0, 40], 'optimal': [27, 31], 'unit': '°C'}
+    # Temperature gauge removed!
 ]
 fig_gauges = go.Figure()
-positions = [(0, 0.23, 0, 1), (0.27, 0.5, 0, 1), (0.53, 0.76, 0, 1), (0.79, 1, 0, 1)]
+positions = [(0, 0.3, 0, 1), (0.35, 0.65, 0, 1), (0.7, 1, 0, 1)]
 for gauge_data, pos in zip(gauges_data, positions):
     value = gauge_data['value']
     optimal = gauge_data['optimal']
@@ -336,7 +335,7 @@ fig_gauges.update_layout(
 st.plotly_chart(fig_gauges, use_container_width=True)
 st.markdown("---")
 
-# ============= DEBRIS DETECTION SECTION =============
+# ============= DEBRIS DETECTION SECTION ============= (unchanged)
 st.markdown('<div class="section-header">🎥 MARINE DEBRIS DETECTION</div>', unsafe_allow_html=True)
 camera_status_html = f"""
 <div class="buoy-card">
@@ -402,7 +401,7 @@ with col2:
     st.plotly_chart(fig_detections, use_container_width=True)
 st.markdown("---")
 
-# ============= ANALYTICS SECTION =============
+# ============= ANALYTICS SECTION ============= (unchanged)
 st.markdown('<div class="section-header">📈 ANALYTICS & TRENDS</div>', unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
@@ -431,10 +430,6 @@ with col2:
     fig_trends.add_trace(go.Scatter(
         x=dates, y=[35000 + np.random.normal(0, 400) for _ in range(7)],
         mode='lines+markers', name='TDS', line=dict(color='#ff6b35', width=2)
-    ))
-    fig_trends.add_trace(go.Scatter(
-        x=dates, y=[29 + np.random.normal(0, 0.5) for _ in range(7)],
-        mode='lines+markers', name='Temp', line=dict(color='#ffbe0b', width=2)
     ))
     fig_trends.update_layout(
         title=dict(text="7-Day Water Quality Trends", x=0.5, font=dict(color='#00d4ff', size=18)),
