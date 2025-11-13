@@ -14,7 +14,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for dark theme
 css_styles = """
 <style>
     .main {
@@ -101,7 +100,6 @@ css_styles = """
 """
 st.markdown(css_styles, unsafe_allow_html=True)
 
-# --- Centered, Large Logo ---
 col1, col2, col3 = st.columns([1,2,1])
 with col2:
     st.image("thalasea-logo.png", width=320)
@@ -116,7 +114,6 @@ title_html = """
 """
 st.markdown(title_html, unsafe_allow_html=True)
 
-# Initialize session state
 if 'last_update' not in st.session_state:
     st.session_state.last_update = datetime.now()
 if 'buoy_data' not in st.session_state:
@@ -124,7 +121,6 @@ if 'buoy_data' not in st.session_state:
 if 'gps_history' not in st.session_state:
     st.session_state.gps_history = []
 
-# Function to generate random live data (realistic, Tanjung Aru)
 def update_live_data():
     current_time = datetime.now()
     base_lat = 5.9552
@@ -163,7 +159,6 @@ def update_live_data():
         }
     }
 
-# Auto-refresh and manual refresh
 col1, col2, col3 = st.columns([2, 1, 2])
 with col2:
     if st.button("🔄 Refresh Data", use_container_width=True):
@@ -179,7 +174,7 @@ if not st.session_state.buoy_data:
 buoy_data = st.session_state.buoy_data['buoy_1']
 st.markdown("---")
 
-# ============= OVERVIEW METRICS =============
+# Overview metrics (unchanged)
 st.markdown('<div class="section-header">📊 SYSTEM OVERVIEW</div>', unsafe_allow_html=True)
 col1, col2, col3, col4 = st.columns(4)
 with col1:
@@ -219,7 +214,7 @@ with col4:
     st.markdown(card_html, unsafe_allow_html=True)
 st.markdown("---")
 
-# ============= GPS TRACKING SECTION (Tanjung Aru) =============
+# GPS section and stats
 st.markdown('<div class="section-header">📡 GPS TRACKING & LOCATION</div>', unsafe_allow_html=True)
 gps_status_html = f"""
 <div class="buoy-card">
@@ -278,7 +273,7 @@ with col2:
         st.markdown(stats_html, unsafe_allow_html=True)
 st.markdown("---")
 
-# ============= WATER QUALITY SECTION =============
+# WATER QUALITY SECTION
 st.markdown('<div class="section-header">💧 WATER QUALITY MONITORING</div>', unsafe_allow_html=True)
 buoy_info_html = f"""
 <div class="buoy-card">
@@ -292,7 +287,7 @@ buoy_info_html = f"""
 st.markdown(buoy_info_html, unsafe_allow_html=True)
 gauges_data = [
     {'name': 'pH', 'value': buoy_data['ph'], 'range': [0, 14], 'optimal': [7.8, 8.5], 'unit': ''},
-    {'name': 'TDS', 'value': buoy_data['tds'], 'range': [0, 50000], 'optimal': [30000, 40000], 'unit': 'ppm'},
+    {'name': 'TDS', 'value': f"{buoy_data['tds']}","raw_value": buoy_data['tds'], 'range': [0, 50000], 'optimal': [30000, 40000], 'unit': 'ppm'},
     {'name': 'TURBIDITY', 'value': buoy_data['turbidity'], 'range': [0, 100], 'optimal': [0, 50], 'unit': 'NTU'},
     {'name': 'TEMPERATURE', 'value': buoy_data['temperature'], 'range': [0, 40], 'optimal': [27, 31], 'unit': '°C'}
 ]
@@ -301,18 +296,25 @@ positions = [(0, 0.23, 0, 1), (0.27, 0.5, 0, 1), (0.53, 0.76, 0, 1), (0.79, 1, 0
 for gauge_data, pos in zip(gauges_data, positions):
     value = gauge_data['value']
     optimal = gauge_data['optimal']
-    if optimal[0] <= value <= optimal[1]:
+    title = f"<b>{gauge_data['name']}</b>"
+    if gauge_data['name'] == 'TDS':
+        # Make sure TDS displays with no 'k', and as pure integer with unit
+        number_display = {'suffix': " ppm", 'font': {'color': 'white', 'size': 16}}
+        value = int(gauge_data['raw_value'])
+    else:
+        number_display = {'suffix': f" {gauge_data['unit']}", 'font': {'color': 'white', 'size': 16}}
+    if optimal[0] <= float(value) <= optimal[1]:
         color = '#00ff88'
-    elif value < optimal[0] * 0.8 or value > optimal[1] * 1.2:
+    elif float(value) < optimal[0] * 0.8 or float(value) > optimal[1] * 1.2:
         color = '#ff6b35'
     else:
         color = '#ffbe0b'
     fig_gauges.add_trace(go.Indicator(
         mode="gauge+number",
-        value=value,
+        value=float(value),
         domain={'x': [pos[0], pos[1]], 'y': [pos[2], pos[3]]},
-        title={'text': f"<b>{gauge_data['name']}</b>", 'font': {'color': 'white', 'size': 14}},
-        number={'suffix': f" {gauge_data['unit']}", 'font': {'color': 'white', 'size': 16}},
+        title={'text': title, 'font': {'color': 'white', 'size': 14}},
+        number=number_display,
         gauge={
             'axis': {'range': [None, gauge_data['range'][1]], 'tickcolor': 'white', 'tickfont': {'color': 'white', 'size': 10}},
             'bar': {'color': color, 'thickness': 0.7},
