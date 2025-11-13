@@ -287,7 +287,7 @@ buoy_info_html = f"""
 st.markdown(buoy_info_html, unsafe_allow_html=True)
 gauges_data = [
     {'name': 'pH', 'value': buoy_data['ph'], 'range': [0, 14], 'optimal': [7.8, 8.5], 'unit': ''},
-    {'name': 'TDS', 'value': f"{buoy_data['tds']}","raw_value": buoy_data['tds'], 'range': [0, 50000], 'optimal': [30000, 40000], 'unit': 'ppm'},
+    {'name': 'TDS', 'value': buoy_data['tds'], 'range': [0, 50000], 'optimal': [30000, 40000], 'unit': 'ppm'},
     {'name': 'TURBIDITY', 'value': buoy_data['turbidity'], 'range': [0, 100], 'optimal': [0, 50], 'unit': 'NTU'},
     {'name': 'TEMPERATURE', 'value': buoy_data['temperature'], 'range': [0, 40], 'optimal': [27, 31], 'unit': '°C'}
 ]
@@ -298,9 +298,7 @@ for gauge_data, pos in zip(gauges_data, positions):
     optimal = gauge_data['optimal']
     title = f"<b>{gauge_data['name']}</b>"
     if gauge_data['name'] == 'TDS':
-        # Make sure TDS displays with no 'k', and as pure integer with unit
-        number_display = {'suffix': " ppm", 'font': {'color': 'white', 'size': 16}}
-        value = int(gauge_data['raw_value'])
+        number_display = {'valueformat': 'd', 'suffix': ' ppm', 'font': {'color': 'white', 'size': 16}}
     else:
         number_display = {'suffix': f" {gauge_data['unit']}", 'font': {'color': 'white', 'size': 16}}
     if optimal[0] <= float(value) <= optimal[1]:
@@ -450,7 +448,6 @@ with col2:
     st.plotly_chart(fig_trends, use_container_width=True)
 st.markdown("---")
 
-# Footer
 footer_html = f"""
 <div style="text-align: center; padding: 20px; background: linear-gradient(145deg, #1a2332 0%, #243040 100%); border-radius: 15px; border: 1px solid #00d4ff;">
     <h3 style="color: #00d4ff; margin-bottom: 10px;">MAREYE Smart Buoy Monitoring System</h3>
