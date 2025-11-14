@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
 from datetime import datetime, timedelta
 import random
 
@@ -60,7 +59,6 @@ def update_live_data():
     st.session_state.gps_history.append({"lat": lat, "lng": lng, "timestamp": current_time})
     if len(st.session_state.gps_history) > 50:
         st.session_state.gps_history = st.session_state.gps_history[-50:]
-    # Generate 25 detections
     detection_types = ["Plastic Bottle", "Food Container", "Fishing Net", "Plastic Bag", "Styrofoam", "Rope", "Metal Can"]
     detections = []
     for i in range(25):
@@ -73,12 +71,12 @@ def update_live_data():
     st.session_state.buoy_data = {
         "buoy1": {
             "status": "Active",
-            "battery": random.randint(75, 95), # Battery %
+            "battery": random.randint(75, 95),
             "lat": lat,
             "lng": lng,
             "ph": round(random.uniform(7.8, 8.4), 2),
-            "tds": random.randint(32000, 38000), # ppm
-            "turbidity": round(random.uniform(5, 25), 1), # NTU
+            "tds": random.randint(32000, 38000),
+            "turbidity": round(random.uniform(5, 25), 1),
             "lastreading": current_time.strftime("%d-%m-%Y at %H:%M:%S"),
             "camera_status": "Recording",
             "detections": detections
@@ -206,10 +204,6 @@ with col2:
                     <p style="color: #888; font-size: 12px; margin: 0;">Total Distance</p>
                     <p style="color: #00ff88; font-size: 24px; font-weight: bold; margin: 5px 0;">{approx_distance:.2f} km</p>
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <p style="color: #888; font-size: 12px; margin: 0;">Data Points</p>
-                    <p style="color: #00d4ff; font-size: 24px; font-weight: bold; margin: 5px 0;">{len(st.session_state.gps_history)}</p>
-                </div>
                 <div>
                     <p style="color: #888; font-size: 12px; margin: 0;">Avg Speed</p>
                     <p style="color: #ff6b35; font-size: 24px; font-weight: bold; margin: 5px 0;">{random.uniform(0.5, 1.5):.2f} km/h</p>
@@ -250,7 +244,6 @@ for gauge_data, pos in zip(gauges_data, positions):
         number_display = dict(valueformat="d", suffix=" ppm", font=dict(color="white", size=16))
     else:
         number_display = dict(suffix=f" {gauge_data['unit']}", font=dict(color="white", size=16))
-    # Gauge color logic
     if optimal[0] <= float(value) <= optimal[1]:
         color = "#00ff88"
     elif optimal[0]*0.8 <= float(value) <= optimal[1]*1.2:
@@ -356,11 +349,28 @@ st.markdown('<div class="section-header">ANALYTICS TRENDS</div>', unsafe_allow_h
 col1, col2 = st.columns(2)
 with col1:
     detection_types = {"Plastic": 45, "Fishing Gear": 25, "Food Containers": 20, "Other": 10}
-    fig_pie = go.Figure(data=[go.Pie(labels=list(detection_types.keys()), values=list(detection_types.values()), hole=0.4, marker=dict(colors=["#ff6b35", "#00d4ff", "#ffbe0b", "#00ff88"]))])
+    fig_pie = go.Figure(data=[go.Pie(
+        labels=list(detection_types.keys()),
+        values=list(detection_types.values()),
+        hole=0.4,
+        marker=dict(colors=["#ff6b35", "#00d4ff", "#ffbe0b", "#00ff88"]),
+        textinfo='percent+label',
+        insidetextorientation="auto",
+        textfont=dict(color="white", size=18),
+        pull=[0.04, 0.04, 0.04, 0.04]
+    )])
     fig_pie.update_layout(
-        title=dict(text="Debris Type Distribution", x=0.5, font=dict(color="#00d4ff", size=18)),
+        title=dict(text="Debris Type Distribution", x=0.5, font=dict(color="#00d4ff", size=20)),
         paper_bgcolor="rgba(0,0,0,0)",
         font=dict(color="white"),
+        legend=dict(
+            orientation="v",
+            font=dict(color="white", size=18),
+            bgcolor="rgba(34,40,55,0.8)",
+            bordercolor="#00d4ff",
+            borderwidth=1,
+            x=1.02
+        ),
         height=350,
         showlegend=True
     )
