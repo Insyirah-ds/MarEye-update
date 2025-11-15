@@ -5,12 +5,14 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import random
 
+# Page configuration and CSS styles
 st.set_page_config(page_title="MAREYE Dashboard", layout="wide", initial_sidebar_state="collapsed")
 
 css_styles = """
 <style>
 .main {background: linear-gradient(135deg, #0a0f1c 0%, #1a1f2e 100%); color: #ffffff;}
 .stApp {background: linear-gradient(135deg, #0a0f1c 0%, #1a1f2e 100%);}
+.dashboard-header {background: linear-gradient(90deg, #00d4ff 0%, #0099cc 50%, #004d66 100%); padding: 25px; border-radius: 20px; margin-bottom: 30px; box-shadow: 0 0 30px rgba(0, 212, 255, 0.4); border: 2px solid #00d4ff;}
 .metric-card {background: linear-gradient(145deg, #1e2a3a 0%, #2a3441 100%); padding: 25px; border-radius: 15px; border: 2px solid #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.25); margin-bottom: 20px; color: #ffffff;}
 .buoy-card {background: linear-gradient(145deg, #1a2332 0%, #243040 100%); padding: 20px; border-radius: 15px; border-left: 5px solid #00ff88; margin-bottom: 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.4); color: #ffffff; border: 1px solid #00ff88;}
 .detection-box {background: linear-gradient(145deg, #2a1f2e 0%, #3d2a40 100%); border: 2px solid #ff6b35; border-radius: 10px; padding: 15px; margin: 10px 0; box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);}
@@ -20,13 +22,11 @@ css_styles = """
 .text-white-high-contrast {color: #ffffff !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); font-weight: 600;}
 .stButton > button {background: linear-gradient(90deg, #00d4ff 0%, #0099cc 100%); border: 2px solid #00d4ff; color: #ffffff; font-weight: bold; box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);}
 .stButton > button:hover {box-shadow: 0 0 25px rgba(0, 212, 255, 0.5); transform: translateY(-2px);}
-.image-thumb {height: 90px; width: auto; border-radius: 8px; box-shadow: 0 1px 8px rgba(0,0,0,0.45);}
-.image-full {max-width: 100%; max-height: 420px; border-radius: 8px; box-shadow: 0 2px 20px rgba(0,0,0,0.45);}
 </style>
 """
 st.markdown(css_styles, unsafe_allow_html=True)
 
-# Title/logo
+# Title section with logo
 col1, col2, col3 = st.columns([1,2,1])
 with col2:
     st.image("thalasea-logo.png", width=320)
@@ -38,6 +38,7 @@ title_html = """
 """
 st.markdown(title_html, unsafe_allow_html=True)
 
+# Buoy, data init
 if "last_update" not in st.session_state:
     st.session_state.last_update = datetime.now()
 if "buoy_data" not in st.session_state:
@@ -61,14 +62,11 @@ def update_live_data():
     detection_types = ["Plastic Bottle", "Food Container", "Fishing Net", "Plastic Bag", "Styrofoam", "Rope", "Metal Can"]
     detections = []
     for i in range(25):
-        det_lat = lat + random.uniform(-0.002, 0.002)
-        det_lng = lng + random.uniform(-0.002, 0.002)
         detections.append({
             "type": random.choice(detection_types),
             "time": (datetime.now() - timedelta(minutes=random.randint(0, 600))).strftime("%H:%M:%S"),
             "confidence": random.randint(75, 99),
-            "latitude": det_lat,
-            "longitude": det_lng,
+            "distance": f"{random.uniform(1.0,4.0):.1f}m"
         })
     st.session_state.buoy_data = {
         "buoy1": {
@@ -104,17 +102,19 @@ buoy_data = st.session_state.buoy_data["buoy1"]
 
 st.markdown("---")
 
-# SYSTEM OVERVIEW
+# ================= SYSTEM OVERVIEW METRICS ==================
 st.markdown('<div class="section-header">SYSTEM OVERVIEW</div>', unsafe_allow_html=True)
 col1, col2, col3, col4, col5 = st.columns(5)
+
 with col1:
-    card_html = """
+    card_html = f"""
     <div class="metric-card">
         <h4 class="text-white-high-contrast">BUOY STATUS</h4>
         <h1 style="color: #00ff88; font-size: 36px; margin: 5px 0;">ACTIVE</h1>
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
+
 with col2:
     card_html = f"""
     <div class="metric-card">
@@ -124,6 +124,7 @@ with col2:
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
+
 with col3:
     card_html = f"""
     <div class="metric-card">
@@ -133,8 +134,9 @@ with col3:
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
+
 with col4:
-    card_html = """
+    card_html = f"""
     <div class="metric-card">
         <h4 class="text-white-high-contrast">GPS STATUS</h4>
         <h1 style="color: #00ff88; font-size: 36px; margin: 5px 0;">📡</h1>
@@ -142,6 +144,7 @@ with col4:
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
+
 with col5:
     card_html = f"""
     <div class="metric-card">
@@ -154,7 +157,7 @@ with col5:
 
 st.markdown("---")
 
-# GPS TRACKING SECTION
+# =========== GPS TRACKING SECTION ==============
 st.markdown('<div class="section-header">GPS TRACKING LOCATION</div>', unsafe_allow_html=True)
 gpsstatushtml = f"""
 <div class="buoy-card">
@@ -179,6 +182,8 @@ gpsstatushtml = f"""
 </div>
 """
 st.markdown(gpsstatushtml, unsafe_allow_html=True)
+
+# Tracking map and movement stats
 col1, col2 = st.columns([2,1])
 with col1:
     if st.session_state.gps_history:
@@ -210,7 +215,7 @@ with col2:
 
 st.markdown("---")
 
-# WATER QUALITY SECTION
+# ============== WATER QUALITY SECTION =============
 st.markdown('<div class="section-header">WATER QUALITY MONITORING</div>', unsafe_allow_html=True)
 buoyinfohtml = f"""
 <div class="buoy-card">
@@ -222,11 +227,13 @@ buoyinfohtml = f"""
 </div>
 """
 st.markdown(buoyinfohtml, unsafe_allow_html=True)
+
 gauges_data = [
     {"name": "pH", "value": buoy_data["ph"], "range": (0, 14), "optimal": (7.8, 8.5), "unit": ""},
     {"name": "TDS", "value": buoy_data["tds"], "range": (0, 50000), "optimal": (32000, 38000), "unit": "ppm"},
     {"name": "TURBIDITY", "value": buoy_data["turbidity"], "range": (0, 100), "optimal": (5, 25), "unit": "NTU"}
 ]
+
 fig_gauges = go.Figure()
 positions = [(0, 0.32, 0, 1), (0.34, 0.67, 0, 1), (0.68, 1, 0, 1)]
 for gauge_data, pos in zip(gauges_data, positions):
@@ -262,6 +269,7 @@ for gauge_data, pos in zip(gauges_data, positions):
             ]
         }
     ))
+
 fig_gauges.update_layout(
     paper_bgcolor="rgba(0,0,0,0)",
     font_color="white",
@@ -273,7 +281,7 @@ st.plotly_chart(fig_gauges, use_container_width=True)
 
 st.markdown("---")
 
-# DEBRIS DETECTION SECTION (with IMAGES and LOCATION)
+# ============== DEBRIS DETECTION SECTION =============
 st.markdown('<div class="section-header">MARINE DEBRIS DETECTION</div>', unsafe_allow_html=True)
 camerastatushtml = f"""
 <div class="buoy-card">
@@ -300,50 +308,23 @@ camerastatushtml = f"""
 """
 st.markdown(camerastatushtml, unsafe_allow_html=True)
 
-img_files = ["plastic image for cctv.jpg", "plastic image for cctv 2.jpg"]
-if "view_img_idx" not in st.session_state:
-    st.session_state.view_img_idx = None
-
 col1, col2 = st.columns([3,2])
 with col1:
     st.markdown("#### Recent Detections")
-    for idx, detection in enumerate(buoy_data["detections"]):
-        show_image = (idx < 2)
-        img_path = img_files[idx] if show_image and idx < len(img_files) else None
-
+    for detection in buoy_data["detections"]:
         detectionhtml = f"""
-        <div class="detection-box" style="display: flex; flex-direction: row; align-items: center;">
-            <div style="flex: 2;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <strong style="color: #00d4ff; font-size: 16px;">{detection["type"]}</strong>
-                    <span style="color: #00ff88; font-weight: bold;">Confidence {detection["confidence"]}</span>
-                </div>
-                <div style="margin: 8px 0;">
-                    <span style="color: #ffffff;">{detection["time"]}</span>
-                    <span style="color: #00d4ff; margin-left: 20px;">
-                        Location Detected: {detection["latitude"]:.5f}, {detection["longitude"]:.5f}
-                    </span>
-                </div>
+        <div class="detection-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #00d4ff; font-size: 16px;">{detection["type"]}</strong>
+                <span style="color: #00ff88; font-weight: bold;">Confidence {detection["confidence"]}</span>
             </div>
-            <div style="flex: 1; text-align: center;">
+            <div style="margin: 8px 0;">
+                <span style="color: #ffffff;">{detection["time"]}</span>
+                <span style="color: #ffffff; margin-left: 20px;">{detection["distance"]}</span>
+            </div>
+        </div>
         """
-        detectionhtml_end = "</div></div>"
-
         st.markdown(detectionhtml, unsafe_allow_html=True)
-        if show_image and img_path:
-            st.image(img_path, use_column_width=False, width=90)
-            if st.button(f"View (Detection {idx+1})", key=f"view_img_{idx}", help="Click to expand image"):
-                st.session_state.view_img_idx = idx
-        else:
-            st.markdown('<div style="height:90px;"></div>', unsafe_allow_html=True)
-        st.markdown(detectionhtml_end, unsafe_allow_html=True)
-
-    if st.session_state.view_img_idx is not None:
-        st.markdown("---")
-        expanded_path = img_files[st.session_state.view_img_idx]
-        st.markdown(f"**Expanded Detection Image:**", unsafe_allow_html=True)
-        st.image(expanded_path, use_column_width=True)
-
 with col2:
     dates = pd.date_range(end=datetime.now(), periods=7, freq='D')
     detections_trend = np.random.poisson(3, len(dates))
@@ -363,7 +344,7 @@ with col2:
 
 st.markdown("---")
 
-# ANALYTICS SECTION
+# ============== ANALYTICS SECTION =============
 st.markdown('<div class="section-header">ANALYTICS TRENDS</div>', unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
@@ -399,4 +380,32 @@ with col2:
     fig_trends = go.Figure()
     fig_trends.add_trace(go.Scatter(x=dates, y=[7.8 + np.random.normal(0, 0.1) for _ in range(7)], mode="lines+markers", name="pH", line=dict(color="#00d4ff", width=2)))
     fig_trends.add_trace(go.Scatter(x=dates, y=[35000 + np.random.normal(0, 400) for _ in range(7)], mode="lines+markers", name="TDS", line=dict(color="#ff6b35", width=2)))
-    fig
+    fig_trends.add_trace(go.Scatter(x=dates, y=[29 + np.random.normal(0, 0.5) for _ in range(7)], mode="lines+markers", name="Temp", line=dict(color="#ffbe0b", width=2)))
+    fig_trends.update_layout(
+        title=dict(text="7-Day Water Quality Trends", x=0.5, font=dict(color="#00d4ff", size=18)),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(26, 35, 50, 0.8)",
+        font=dict(color="white"),
+        xaxis=dict(gridcolor="rgba(0,212,255,0.2)"),
+        yaxis=dict(gridcolor="rgba(0,212,255,0.2)"),
+        height=350
+    )
+    st.plotly_chart(fig_trends, use_container_width=True)
+
+st.markdown("---")
+
+# ============== FOOTER SECTION =============
+footerhtml = f"""
+<div style="text-align: center; padding: 20px; background: linear-gradient(145deg, #1a2332 0%, #243040 100%); border-radius: 15px; border: 1px solid #00d4ff;">
+    <h3 style="color: #00d4ff; margin-bottom: 10px;">MAREYE Smart Buoy Monitoring System</h3>
+    <p class="text-white-high-contrast">Real-time Marine Monitoring | AI Detection | GPS Tracking | Water Quality Analysis</p>
+    <div style="display: flex; justify-content: center; gap: 30px; margin: 15px 0; flex-wrap: wrap;">
+        <span class="text-white-high-contrast">Last Updated {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</span>
+        <span>System <span style="color: #00ff88; font-weight: bold;">ONLINE</span></span>
+        <span class="text-white-high-contrast">Battery {buoy_data['battery']}%</span>
+    </div>
+    <p style="color: #888; font-size: 12px; margin-top: 10px;">Protecting our oceans through advanced technology</p>
+</div>
+"""
+st.markdown(footerhtml, unsafe_allow_html=True)
+
